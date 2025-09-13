@@ -1,0 +1,375 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>GATA — Investment Platform (Demo)</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    :root{
+      --bg:#0f1724; /* dark */
+      --card:#0b1220;
+      --accent:#e8ce6b; /* rob-roy */
+      --muted:#9aa4a0;
+      --glass: rgba(255,255,255,0.03);
+      --success:#22c55e;
+      font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:linear-gradient(180deg,#071427 0%, #06121b 100%);color:#e6eef3}
+    .container{max-width:1100px;margin:36px auto;padding:24px}
+    header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+    .brand{display:flex;align-items:center;gap:12px}
+    .logo{width:56px;height:56px;border-radius:12px;background:linear-gradient(135deg,var(--accent),#fff3b0);display:flex;align-items:center;justify-content:center;color:#072030;font-weight:800;font-size:20px}
+    h1{margin:0;font-size:20px}
+    p.lead{margin:0;color:var(--muted)}.grid{display:grid;grid-template-columns:1fr 360px;gap:20px}
+.card{background:var(--card);padding:18px;border-radius:14px;box-shadow:0 6px 18px rgba(4,8,12,0.6);}
+
+/* main dashboard */
+.stats{display:flex;gap:12px;margin-bottom:16px}
+.stat{flex:1;background:var(--glass);padding:12px;border-radius:10px}
+.stat h3{margin:0;font-size:13px;color:var(--muted)}
+.stat .value{font-size:18px;font-weight:700}
+
+.chart-wrap{height:260px}
+
+.invest-list{display:flex;flex-direction:column;gap:10px}
+.invest-item{display:flex;align-items:center;justify-content:space-between;padding:10px;border-radius:10px;background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent)}
+.invest-meta{display:flex;gap:12px;align-items:center}
+.pill{padding:6px 10px;border-radius:999px;background:rgba(255,255,255,0.03);font-size:12px}
+
+.cta{display:flex;gap:10px}
+.btn{background:linear-gradient(90deg,var(--accent),#ffd77f);color:#06121b;padding:10px 14px;border-radius:10px;border:none;font-weight:700;cursor:pointer}
+.btn.ghost{background:transparent;color:var(--accent);border:1px solid rgba(255,255,255,0.06)}
+
+aside .card{position:sticky;top:24px}
+.balance{font-size:28px;font-weight:800}
+.small{font-size:13px;color:var(--muted)}
+
+.progress{height:10px;background:rgba(255,255,255,0.04);border-radius:999px;margin-top:8px}
+.progress > i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),#ffd77f);border-radius:999px}
+
+.testimonials{display:flex;flex-direction:column;gap:10px;margin-top:12px}
+.review{background:rgba(255,255,255,0.02);padding:10px;border-radius:10px}
+
+footer{margin-top:20px;color:var(--muted);font-size:13px;text-align:center}
+
+/* modal */
+.modal-bg{position:fixed;inset:0;background:rgba(2,6,10,0.6);display:none;align-items:center;justify-content:center}
+.modal{width:420px;background:#071425;padding:20px;border-radius:12px}
+label{display:block;font-size:13px;margin-bottom:6px;color:var(--muted)}
+input[type=number],input[type=text],select{width:100%;padding:10px;border-radius:8px;border:none;background:rgba(255,255,255,0.02);color:inherit;margin-bottom:10px}
+
+/* responsive */
+@media (max-width:980px){.grid{grid-template-columns:1fr}.container{padding:12px}.logo{width:46px;height:46px}}
+
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="brand">
+        <div class="logo">G</div>
+        <div>
+          <h1>GATA — Growth Investments</h1>
+          <p class="lead">Simulated demo · Frontend-only · Not financial advice</p>
+        </div>
+      </div>
+      <div class="cta">
+        <button class="btn" id="openDeposit">Deposit</button>
+        <button class="btn ghost" id="openWithdraw">Redeem</button>
+      </div>
+    </header><div class="grid">
+  <main>
+    <div class="card">
+      <div class="stats">
+        <div class="stat">
+          <h3>Total Portfolio</h3>
+          <div class="value balance" id="totalBalance">₦0.00</div>
+          <div class="small">Real-time estimated value</div>
+        </div>
+        <div class="stat">
+          <h3>Daily Change</h3>
+          <div class="value" id="dailyChange">+0.00%</div>
+          <div class="small">Simulated performance</div>
+        </div>
+        <div class="stat">
+          <h3>Available</h3>
+          <div class="value" id="availableBalance">₦0.00</div>
+          <div class="small">Redeemable instantly (demo)</div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:12px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+          <div style="font-weight:700">Portfolio performance</div>
+          <div class="small">Projected growth (demo)</div>
+        </div>
+        <div class="chart-wrap"><canvas id="perfChart" style="width:100%;height:100%"></canvas></div>
+      </div>
+
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <div style="font-weight:700">Active Investments</div>
+        <div class="small">Tap an item to see details</div>
+      </div>
+
+      <div class="invest-list" id="investList"></div>
+    </div>
+
+    <div class="card" style="margin-top:14px">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div style="font-weight:700">Quick profit estimator</div>
+        <div class="small">See how compounding grows value</div>
+      </div>
+      <div style="margin-top:10px">
+        <label>Amount to invest (₦)</label>
+        <input id="estAmount" type="number" value="10000">
+        <label>Annual return (%)</label>
+        <input id="estRate" type="number" value="30">
+        <label>Years</label>
+        <input id="estYears" type="number" value="1">
+        <button class="btn" id="calcBtn">Estimate</button>
+        <div style="margin-top:10px" id="estResult"></div>
+      </div>
+    </div>
+
+  </main>
+
+  <aside>
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <div class="small">Available balance</div>
+          <div class="balance" id="sideAvailable">₦0.00</div>
+        </div>
+        <div style="text-align:right">
+          <div class="small">ROI (est.)</div>
+          <div style="font-weight:800;color:var(--accent)">+30% p.a.</div>
+        </div>
+      </div>
+
+      <div style="margin-top:12px">
+        <div class="small">Portfolio health</div>
+        <div class="progress"><i id="healthBar" style="width:40%"></i></div>
+        <div class="small" style="margin-top:6px">Diversification, activity & growth</div>
+      </div>
+
+      <div style="margin-top:12px;display:flex;gap:8px">
+        <button class="btn" id="learnBtn">How it works</button>
+        <button class="btn ghost" id="faqBtn">FAQ</button>
+      </div>
+
+      <div class="testimonials">
+        <div class="small" style="margin-top:10px">Trusted by early users</div>
+        <div class="review">"I tested the demo — the UI is clean and the growth curve is motivating." — Ade</div>
+        <div class="review">"Onboarding was quick. Crisp layout and clear numbers." — Ife</div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:12px">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div style="font-weight:700">Security & Trust</div>
+        <div class="small">Demo badges</div>
+      </div>
+      <div style="margin-top:10px">
+        <div class="pill">KYC: Required</div>
+        <div class="pill" style="margin-left:8px">SSL</div>
+        <div class="pill" style="margin-left:8px">Insurance</div>
+      </div>
+      <p class="small" style="margin-top:10px">NOTE: This is a frontend demo. To accept real money you must integrate payment rails, backend ledger, audits, and regulatory compliance.</p>
+    </div>
+  </aside>
+</div>
+
+<footer>GATA Demo · Built with HTML/CSS/JS · Not for production use</footer>
+
+  </div>  <!-- deposit modal -->  <div class="modal-bg" id="modalBg">
+    <div class="modal">
+      <h3 id="modalTitle">Deposit funds</h3>
+      <label>Full name</label>
+      <input id="fullname" type="text" placeholder="e.g. Naza Raymond">
+      <label>Amount (₦)</label>
+      <input id="amount" type="number" min="100" value="1000">
+      <label>Choose plan</label>
+      <select id="plan">
+        <option value="conservative">Conservative — 12% p.a.</option>
+        <option value="balanced" selected>Balanced — 30% p.a.</option>
+        <option value="aggressive">Aggressive — 60% p.a.</option>
+      </select>
+      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:10px">
+        <button class="btn ghost" id="cancelModal">Cancel</button>
+        <button class="btn" id="confirmDeposit">Submit (demo)</button>
+      </div>
+    </div>
+  </div>  <script>
+    // --- Demo data & state
+    const state = {
+      investments: [],
+      available: 0,
+      growthRateDaily: 0.0008, // base daily simulation
+    }
+
+    // utilities
+    const fmt = n => new Intl.NumberFormat('en-NG', { style: 'currency', currency: 'NGN', maximumFractionDigits:2 }).format(n)
+
+    // sample seed
+    function seed(){
+      state.investments = [
+        {id:1,title:'GATA Growth Plan',amount:50000,rate:0.30,days:0,created:Date.now()-6*24*3600e3},
+        {id:2,title:'Market Booster',amount:15000,rate:0.12,days:0,created:Date.now()-2*24*3600e3}
+      ]
+      state.available = 8000
+      renderAll()
+    }
+
+    // simulate daily growth (runs once every 1s in demo to show motion)
+    function tick(){
+      // simulate small market movement
+      const r = (Math.sin(Date.now()/60000)+1)/2000 // small oscillation
+      state.investments.forEach(inv=>{
+        // increase days
+        inv.days += 1/1440 // fraction of a day (since tick is per-minute-scale demo)
+        // apply tiny growth every tick (simulate continuous compounding)
+        const daily = inv.rate/365
+        inv.amount = inv.amount * Math.pow(1+daily, 1/60) // small chunk
+      })
+      renderAll()
+    }
+
+    // UI renderers
+    function renderAll(){
+      const total = state.investments.reduce((s,i)=>s+i.amount,0) + state.available
+      const invested = state.investments.reduce((s,i)=>s+i.amount,0)
+      document.getElementById('totalBalance').innerText = fmt(total)
+      document.getElementById('availableBalance').innerText = fmt(state.available)
+      document.getElementById('sideAvailable').innerText = fmt(state.available)
+
+      // daily change (simulated)
+      const dailyChange = ((Math.random()-0.48)*0.6).toFixed(2)
+      const dcEl = document.getElementById('dailyChange')
+      dcEl.innerText = (dailyChange>0?'+':'') + dailyChange + '%'
+      dcEl.style.color = dailyChange>=0? 'var(--accent)':'#ef4444'
+
+      // portfolio health
+      const health = Math.min(90, 40 + (state.investments.length*10))
+      document.getElementById('healthBar').style.width = health + '%'
+
+      renderList()
+      updateChart()
+    }
+
+    function renderList(){
+      const wrap = document.getElementById('investList')
+      wrap.innerHTML = ''
+      state.investments.forEach(inv=>{
+        const div = document.createElement('div')
+        div.className='invest-item'
+        div.innerHTML = `
+          <div class="invest-meta">
+            <div style="font-weight:700">${inv.title}</div>
+            <div class="pill">${(inv.rate*100).toFixed(0)}% p.a.</div>
+          </div>
+          <div style="text-align:right">
+            <div style="font-weight:800">${fmt(inv.amount)}</div>
+            <div class="small">Invested ${inv.days.toFixed(0)}d ago</div>
+          </div>`
+        div.addEventListener('click',()=>showDetail(inv))
+        wrap.appendChild(div)
+      })
+    }
+
+    // Chart
+    let chart
+    function updateChart(){
+      const ctx = document.getElementById('perfChart')
+      const labels = []
+      const data = []
+      const total0 = state.investments.reduce((s,i)=>s+i.amount,0) + state.available
+      // create 12 months projection
+      let val = total0
+      for(let m=0;m<12;m++){
+        labels.push((new Date(Date.now()+m*30*24*3600e3)).toLocaleString('default',{month:'short'}))
+        // assume avg weighted rate
+        const avgRate = state.investments.length? (state.investments.reduce((s,i)=>s+i.rate*i.amount,0)/state.investments.reduce((s,i)=>s+i.amount,0)) : 0.30
+        val = val * (1 + avgRate/12)
+        data.push(+val.toFixed(2))
+      }
+
+      if(!chart){
+        chart = new Chart(ctx,{
+          type:'line',
+          data:{labels, datasets:[{label:'Portfolio (projection)',data,fill:true,tension:0.3}]},
+          options:{plugins:{legend:{display:false}},scales:{y:{beginAtZero:false,ticks:{callback:(v)=> new Intl.NumberFormat('en-NG',{style:'currency',currency:'NGN'}).format(v)}}}
+        })
+      } else {
+        chart.data.labels = labels
+        chart.data.datasets[0].data = data
+        chart.update()
+      }
+    }
+
+    // modal actions
+    const modalBg = document.getElementById('modalBg')
+    document.getElementById('openDeposit').addEventListener('click',()=>openModal('deposit'))
+    document.getElementById('openWithdraw').addEventListener('click',()=>openModal('withdraw'))
+    document.getElementById('cancelModal').addEventListener('click',closeModal)
+
+    function openModal(mode){
+      document.getElementById('modalTitle').innerText = mode==='deposit'? 'Deposit funds' : 'Redeem funds (demo)'
+      modalBg.style.display='flex'
+      document.getElementById('confirmDeposit').dataset.mode = mode
+    }
+    function closeModal(){ modalBg.style.display='none' }
+
+    document.getElementById('confirmDeposit').addEventListener('click',()=>{
+      const mode = event.target.dataset.mode || 'deposit'
+      const name = document.getElementById('fullname').value || 'Anon'
+      const amt = Number(document.getElementById('amount').value) || 0
+      const plan = document.getElementById('plan').value
+      if(amt<=0){alert('Enter a valid amount');return}
+
+      if(mode==='deposit'){
+        // simulate deposit -> create investment item
+        const rate = plan==='conservative'?0.12: plan==='balanced'?0.30:0.60
+        const newInv = {id:Date.now(),title:`${plan[0].toUpperCase()+plan.slice(1)} Plan`,amount:amt,rate,days:0,created:Date.now()}
+        state.investments.push(newInv)
+      } else {
+        // withdraw: remove from available first or from smallest investments
+        let left = amt
+        // remove from available
+        if(state.available>=left){ state.available -= left; left=0 }
+        for(let i=state.investments.length-1;i>=0 && left>0;i--){
+          const inv = state.investments[i]
+          if(inv.amount<=left){ left -= inv.amount; state.investments.splice(i,1) }
+          else { inv.amount -= left; left=0 }
+        }
+      }
+
+      closeModal(); renderAll()
+    })
+
+    function showDetail(inv){
+      alert(`${inv.title}\nAmount: ${fmt(inv.amount)}\nRate: ${(inv.rate*100).toFixed(1)}% p.a.`)
+    }
+
+    // estimator
+    document.getElementById('calcBtn').addEventListener('click',()=>{
+      const amt = Number(document.getElementById('estAmount').value)
+      const r = Number(document.getElementById('estRate').value)/100
+      const y = Number(document.getElementById('estYears').value)
+      const future = amt * Math.pow(1 + r, y)
+      document.getElementById('estResult').innerHTML = `<div style="font-weight:800;margin-top:8px">Projected: ${fmt(future)} (from ${fmt(amt)} in ${y}y)</div>`
+    })
+
+    // small helpers
+    document.getElementById('learnBtn').addEventListener('click',()=>{
+      alert('How it works:\n1) Deposit funds (demo)\n2) Funds allocated to selected plan\n3) Growth is simulated and shown in your portfolio\n\nTo make this production-ready you need a backend ledger, payment integration, compliance (KYC/AML), and security audits.')
+    })
+
+    // init
+    seed()
+    setInterval(tick,1000)
+  </script></body>
+</html>
