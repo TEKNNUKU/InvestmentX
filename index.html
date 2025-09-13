@@ -898,4 +898,530 @@
         {
           id: 2,
           title: "Tech Innovation Portfolio",
-          amount:
+          amount: 35000,
+          rate: 0.18,
+          icon: "TI",
+          duration: "3 years",
+          performance: 22.8
+        },
+        {
+          id: 3,
+          title: "ESG Sustainable Fund",
+          amount: 25000,
+          rate: 0.10,
+          icon: "ES",
+          duration: "5 years",
+          performance: 11.5
+        },
+        {
+          id: 4,
+          title: "Real Estate REIT",
+          amount: 10000,
+          rate: 0.08,
+          icon: "RE",
+          duration: "1 year",
+          performance: 9.2
+        }
+      ]
+    };
+
+    // Configuration
+    const CONFIG = {
+      PAYMENT_URL: 'https://app.hel.io/pay/68bc8edb2c858ea985286a83',
+      REFRESH_INTERVAL: 30000,
+      CHART_ANIMATION_DURATION: 1000
+    };
+
+    // Utility Functions
+    const formatCurrency = (amount) => {
+      return new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD',
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      }).format(amount);
+    };
+
+    const formatPercentage = (value, decimals = 2) => {
+      return `${value >= 0 ? '+' : ''}${value.toFixed(decimals)}%`;
+    };
+
+    const showNotification = (message, type = 'success') => {
+      const notification = document.createElement('div');
+      notification.className = `notification ${type}`;
+      notification.textContent = message;
+      document.body.appendChild(notification);
+      
+      setTimeout(() => notification.classList.add('show'), 100);
+      setTimeout(() => {
+        notification.classList.remove('show');
+        setTimeout(() => notification.remove(), 300);
+      }, 3000);
+    };
+
+    const setLoading = (element, isLoading) => {
+      if (isLoading) {
+        element.classList.add('loading');
+        element.style.pointerEvents = 'none';
+      } else {
+        element.classList.remove('loading');
+        element.style.pointerEvents = 'auto';
+      }
+    };
+
+    // API Simulation
+    const api = {
+      async fetchPortfolio() {
+        // Simulate API call
+        await new Promise(resolve => setTimeout(resolve, 500));
+        return {
+          success: true,
+          data: state.portfolio
+        };
+      },
+
+      async createInvestment(data) {
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        return {
+          success: true,
+          message: 'Investment order created successfully',
+          data: { orderId: Date.now() }
+        };
+      },
+
+      async processWithdrawal(data) {
+        await new Promise(resolve => setTimeout(resolve, 800));
+        if (data.amount > state.portfolio.available) {
+          return {
+            success: false,
+            message: 'Insufficient available balance'
+          };
+        }
+        return {
+          success: true,
+          message: 'Withdrawal request submitted successfully'
+        };
+      },
+
+      async calculateReturns(data) {
+        await new Promise(resolve => setTimeout(resolve, 300));
+        const futureValue = data.amount * Math.pow(1 + data.rate / 100, data.years);
+        return {
+          success: true,
+          data: {
+            initialAmount: data.amount,
+            futureValue: futureValue,
+            totalReturn: futureValue - data.amount,
+            annualReturn: data.rate
+          }
+        };
+      }
+    };
+
+    // Chart Management
+    let performanceChart = null;
+
+    const initializeChart = () => {
+      const ctx = document.getElementById('performanceChart').getContext('2d');
+      
+      // Generate sample data for 12 months
+      const months = [];
+      const values = [];
+      const baseValue = state.portfolio.total - state.portfolio.returns;
+      
+      for (let i = 0; i < 12; i++) {
+        const date = new Date();
+        date.setMonth(date.getMonth() - 11 + i);
+        months.push(date.toLocaleDateString('en-US', { month: 'short' }));
+        
+        const growth = Math.pow(1 + 0.12/12, i + 1);
+        const noise = 1 + (Math.random() - 0.5) * 0.1;
+        values.push(baseValue * growth * noise);
+      }
+
+      const gradient = ctx.createLinearGradient(0, 0, 0, 300);
+      gradient.addColorStop(0, 'rgba(59, 130, 246, 0.3)');
+      gradient.addColorStop(1, 'rgba(59, 130, 246, 0.05)');
+
+      performanceChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: months,
+          datasets: [{
+            label: 'Portfolio Value',
+            data: values,
+            borderColor: '#3b82f6',
+            backgroundColor: gradient,
+            borderWidth: 3,
+            fill: true,
+            tension: 0.4,
+            pointBackgroundColor: '#3b82f6',
+            pointBorderColor: '#ffffff',
+            pointBorderWidth: 2,
+            pointRadius: 6,
+            pointHoverRadius: 8
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: false
+            },
+            tooltip: {
+              backgroundColor: 'rgba(19, 25, 34, 0.95)',
+              titleColor: '#f8fafc',
+              bodyColor: '#f8fafc',
+              borderColor: '#3b82f6',
+              borderWidth: 1,
+              cornerRadius: 12,
+              displayColors: false,
+              callbacks: {
+                label: function(context) {
+                  return `Value: ${formatCurrency(context.parsed.y)}`;
+                }
+              }
+            }
+          },
+          interaction: {
+            intersect: false,
+            mode: 'index'
+          },
+          scales: {
+            x: {
+              grid: {
+                display: false
+              },
+              ticks: {
+                color: '#64748b',
+                font: {
+                  family: 'Inter',
+                  size: 12
+                }
+              }
+            },
+            y: {
+              grid: {
+                color: 'rgba(148, 163, 184, 0.1)'
+              },
+              ticks: {
+                color: '#64748b',
+                font: {
+                  family: 'Inter',
+                  size: 12
+                },
+                callback: function(value) {
+                  return formatCurrency(value);
+                }
+              }
+            }
+          },
+          animation: {
+            duration: CONFIG.CHART_ANIMATION_DURATION,
+            easing: 'easeInOutQuart'
+          }
+        }
+      });
+    };
+
+    // UI Rendering Functions
+    const renderPortfolioStats = () => {
+      document.getElementById('totalPortfolio').textContent = formatCurrency(state.portfolio.total);
+      document.getElementById('availableBalance').textContent = formatCurrency(state.portfolio.available);
+      document.getElementById('totalReturns').textContent = formatCurrency(state.portfolio.returns);
+      document.getElementById('sidebarBalance').textContent = formatCurrency(state.portfolio.available);
+      
+      const changeElement = document.getElementById('portfolioChange');
+      changeElement.textContent = formatPercentage(state.portfolio.dailyChange);
+      changeElement.className = `stat-change ${state.portfolio.dailyChange >= 0 ? 'positive' : 'negative'}`;
+    };
+
+    const renderInvestmentList = () => {
+      const container = document.getElementById('investmentList');
+      container.innerHTML = '';
+
+      state.investments.forEach(investment => {
+        const item = document.createElement('div');
+        item.className = 'investment-item';
+        item.innerHTML = `
+          <div class="investment-meta">
+            <div class="investment-icon">${investment.icon}</div>
+            <div class="investment-details">
+              <h4>${investment.title}</h4>
+              <div class="meta">${formatPercentage(investment.rate * 100, 1)} APY • ${investment.duration}</div>
+            </div>
+          </div>
+          <div class="investment-performance">
+            <div class="investment-amount">${formatCurrency(investment.amount)}</div>
+            <div class="investment-return positive">${formatPercentage(investment.performance)}</div>
+          </div>
+        `;
+        
+        item.addEventListener('click', () => showInvestmentDetails(investment));
+        container.appendChild(item);
+      });
+    };
+
+    const showInvestmentDetails = (investment) => {
+      const details = `
+Investment: ${investment.title}
+Amount Invested: ${formatCurrency(investment.amount)}
+Annual Rate: ${formatPercentage(investment.rate * 100, 1)}
+Current Performance: ${formatPercentage(investment.performance)}
+Duration: ${investment.duration}
+Status: Active
+
+This investment is performing ${investment.performance > investment.rate * 100 ? 'above' : 'below'} expected returns.
+      `;
+      
+      showNotification('Investment details loaded', 'success');
+      alert(details); // In production, this would be a proper modal
+    };
+
+    // Modal Management
+    const openModal = (modalId) => {
+      const modal = document.getElementById(modalId);
+      modal.style.display = 'flex';
+      setTimeout(() => modal.querySelector('.modal').classList.add('show'), 50);
+    };
+
+    const closeModal = (modalId) => {
+      const modal = document.getElementById(modalId);
+      modal.querySelector('.modal').classList.remove('show');
+      setTimeout(() => modal.style.display = 'none', 300);
+    };
+
+    // Calculator Functions
+    const calculateReturns = async () => {
+      const amount = parseFloat(document.getElementById('calcAmount').value) || 0;
+      const rate = parseFloat(document.getElementById('calcRate').value) || 0;
+      const years = parseFloat(document.getElementById('calcYears').value) || 0;
+
+      if (amount <= 0 || rate <= 0 || years <= 0) {
+        showNotification('Please enter valid values for all fields', 'error');
+        return;
+      }
+
+      const btn = document.getElementById('calculateBtn');
+      setLoading(btn, true);
+      btn.innerHTML = '<div class="spinner"></div> Calculating...';
+
+      try {
+        const response = await api.calculateReturns({ amount, rate, years });
+        
+        if (response.success) {
+          const result = document.getElementById('calculatorResult');
+          result.innerHTML = `
+            <div class="calculator-result">
+              <div style="font-size: 24px; margin-bottom: 8px;">${formatCurrency(response.data.futureValue)}</div>
+              <div style="font-size: 14px; opacity: 0.9;">
+                Initial: ${formatCurrency(response.data.initialAmount)} → 
+                Profit: ${formatCurrency(response.data.totalReturn)}
+              </div>
+            </div>
+          `;
+          showNotification('Calculation completed successfully', 'success');
+        }
+      } catch (error) {
+        showNotification('Calculation failed. Please try again.', 'error');
+      } finally {
+        btn.innerHTML = 'Calculate Returns';
+        setLoading(btn, false);
+      }
+    };
+
+    // Form Handlers
+    const handleInvestment = async (e) => {
+      e.preventDefault();
+      const formData = new FormData(e.target);
+      const data = {
+        name: document.getElementById('investorName').value,
+        amount: parseFloat(document.getElementById('investmentAmount').value),
+        plan: document.getElementById('investmentPlan').value
+      };
+
+      if (!data.name || data.amount < 100) {
+        showNotification('Please fill all fields with valid values', 'error');
+        return;
+      }
+
+      const submitBtn = e.target.querySelector('button[type="submit"]');
+      setLoading(submitBtn, true);
+      submitBtn.innerHTML = '<div class="spinner"></div> Processing...';
+
+      try {
+        const response = await api.createInvestment(data);
+        
+        if (response.success) {
+          // Open payment processor in new tab
+          window.open(CONFIG.PAYMENT_URL, '_blank');
+          closeModal('investModal');
+          showNotification('Redirected to secure payment processing', 'success');
+          
+          // Reset form
+          document.getElementById('investmentForm').reset();
+        }
+      } catch (error) {
+        showNotification('Investment processing failed. Please try again.', 'error');
+      } finally {
+        submitBtn.innerHTML = 'Proceed to Payment';
+        setLoading(submitBtn, false);
+      }
+    };
+
+    const handleWithdrawal = async (e) => {
+      e.preventDefault();
+      const data = {
+        amount: parseFloat(document.getElementById('withdrawAmount').value),
+        method: document.getElementById('withdrawMethod').value
+      };
+
+      if (data.amount < 10) {
+        showNotification('Minimum withdrawal amount is $10', 'error');
+        return;
+      }
+
+      const submitBtn = e.target.querySelector('button[type="submit"]');
+      setLoading(submitBtn, true);
+      submitBtn.innerHTML = '<div class="spinner"></div> Processing...';
+
+      try {
+        const response = await api.processWithdrawal(data);
+        
+        if (response.success) {
+          closeModal('withdrawModal');
+          showNotification(response.message, 'success');
+          document.getElementById('withdrawalForm').reset();
+          
+          // Update state
+          state.portfolio.available -= data.amount;
+          renderPortfolioStats();
+        } else {
+          showNotification(response.message, 'error');
+        }
+      } catch (error) {
+        showNotification('Withdrawal processing failed. Please try again.', 'error');
+      } finally {
+        submitBtn.innerHTML = 'Submit Withdrawal';
+        setLoading(submitBtn, false);
+      }
+    };
+
+    // Event Listeners
+    const initializeEventListeners = () => {
+      // Header buttons
+      document.getElementById('investBtn').addEventListener('click', () => openModal('investModal'));
+      document.getElementById('withdrawBtn').addEventListener('click', () => openModal('withdrawModal'));
+      document.getElementById('quickInvest').addEventListener('click', () => openModal('investModal'));
+
+      // Modal controls
+      document.getElementById('cancelInvest').addEventListener('click', () => closeModal('investModal'));
+      document.getElementById('cancelWithdraw').addEventListener('click', () => closeModal('withdrawModal'));
+
+      // Close modals on overlay click
+      document.getElementById('investModal').addEventListener('click', (e) => {
+        if (e.target === e.currentTarget) closeModal('investModal');
+      });
+      document.getElementById('withdrawModal').addEventListener('click', (e) => {
+        if (e.target === e.currentTarget) closeModal('withdrawModal');
+      });
+
+      // Form submissions
+      document.getElementById('investmentForm').addEventListener('submit', handleInvestment);
+      document.getElementById('withdrawalForm').addEventListener('submit', handleWithdrawal);
+
+      // Calculator
+      document.getElementById('calculateBtn').addEventListener('click', calculateReturns);
+
+      // Learn more button
+      document.getElementById('learnMore').addEventListener('click', () => {
+        const info = `
+How InvestX Works:
+
+1. Institutional-Grade Investments
+   • Access to hedge fund strategies
+   • Diversified portfolio management
+   • Professional risk assessment
+
+2. Transparent Operations
+   • Real-time performance tracking
+   • Monthly detailed reports
+   • No hidden fees or charges
+
+3. Security & Compliance
+   • SEC registered investment advisor
+   • SIPC protected accounts
+   • Bank-level security infrastructure
+
+4. Easy Management
+   • Mobile and web access
+   • Automated rebalancing
+   • 24/7 customer support
+
+Minimum investment: $100
+Average annual returns: 10-15%
+Management fee: 1% annually
+        `;
+        alert(info);
+      });
+
+      // Keyboard shortcuts
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+          closeModal('investModal');
+          closeModal('withdrawModal');
+        }
+      });
+    };
+
+    // Auto-refresh functionality
+    const startAutoRefresh = () => {
+      setInterval(async () => {
+        try {
+          const response = await api.fetchPortfolio();
+          if (response.success) {
+            // Simulate small changes
+            state.portfolio.dailyChange = (Math.random() - 0.5) * 5;
+            state.portfolio.total += (Math.random() - 0.5) * 1000;
+            renderPortfolioStats();
+          }
+        } catch (error) {
+          console.warn('Auto-refresh failed:', error);
+        }
+      }, CONFIG.REFRESH_INTERVAL);
+    };
+
+    // Initialize Application
+    const initializeApp = async () => {
+      try {
+        // Show loading state
+        document.body.style.opacity = '0.8';
+        
+        // Initialize components
+        renderPortfolioStats();
+        renderInvestmentList();
+        initializeChart();
+        initializeEventListeners();
+        
+        // Start background processes
+        startAutoRefresh();
+        
+        // Show success message
+        setTimeout(() => {
+          document.body.style.opacity = '1';
+          showNotification('Portfolio loaded successfully', 'success');
+        }, 500);
+        
+      } catch (error) {
+        console.error('App initialization failed:', error);
+        showNotification('Failed to load portfolio data', 'error');
+      }
+    };
+
+    // Start the application
+    document.addEventListener('DOMContentLoaded', initializeApp);
+
+  </script>
+</body>
+</html>
