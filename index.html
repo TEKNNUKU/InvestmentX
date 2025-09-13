@@ -664,8 +664,13 @@
         </div>
       </div>
       <div class="header-actions">
-        <button class="btn btn-secondary" id="withdrawBtn">Withdraw</button>
-        <button class="btn btn-primary" id="investBtn">Invest Now</button>
+        <button class="btn btn-secondary" id="loginBtn">Login</button>
+        <button class="btn btn-primary" id="registerBtn">Get Started</button>
+        <div id="userActions" style="display: none;">
+          <button class="btn btn-secondary" id="withdrawBtn">Withdraw</button>
+          <button class="btn btn-primary" id="investBtn">Invest Now</button>
+          <button class="btn" id="logoutBtn" style="background: transparent; color: var(--text-secondary); padding: 8px;">Logout</button>
+        </div>
       </div>
     </header>
 
@@ -800,6 +805,120 @@
     </footer>
   </div>
 
+  <!-- Login Modal -->
+  <div class="modal-overlay" id="loginModal">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title">Welcome Back</div>
+        <p style="color: var(--text-secondary); margin: 0;">Sign in to your InvestX account</p>
+      </div>
+      <form id="loginForm">
+        <div class="form-group">
+          <label class="form-label">Email Address</label>
+          <input type="email" class="form-input" id="loginEmail" required placeholder="your@email.com">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Password</label>
+          <input type="password" class="form-input" id="loginPassword" required placeholder="••••••••">
+        </div>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin: 16px 0;">
+          <label style="display: flex; align-items: center; gap: 8px; font-size: 14px; cursor: pointer;">
+            <input type="checkbox" id="rememberMe" style="margin: 0;">
+            Remember me
+          </label>
+          <a href="#" style="color: var(--accent-primary); font-size: 14px; text-decoration: none;" id="forgotPassword">Forgot password?</a>
+        </div>
+        <div class="modal-actions" style="flex-direction: column; gap: 12px;">
+          <button type="submit" class="btn btn-primary" style="width: 100%;">Sign In</button>
+          <button type="button" class="btn btn-secondary" id="cancelLogin" style="width: 100%;">Cancel</button>
+        </div>
+        <div style="text-align: center; margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border);">
+          <p style="color: var(--text-secondary); margin: 0; font-size: 14px;">
+            Don't have an account? 
+            <a href="#" style="color: var(--accent-primary); text-decoration: none;" id="switchToRegister">Sign up here</a>
+          </p>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Register Modal -->
+  <div class="modal-overlay" id="registerModal">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title">Create Your Account</div>
+        <p style="color: var(--text-secondary); margin: 0;">Join thousands of successful investors</p>
+      </div>
+      <form id="registerForm">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+          <div class="form-group">
+            <label class="form-label">First Name</label>
+            <input type="text" class="form-input" id="registerFirstName" required placeholder="John">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Last Name</label>
+            <input type="text" class="form-input" id="registerLastName" required placeholder="Doe">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email Address</label>
+          <input type="email" class="form-input" id="registerEmail" required placeholder="your@email.com">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Phone Number</label>
+          <input type="tel" class="form-input" id="registerPhone" required placeholder="+1 (555) 123-4567">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Password</label>
+          <input type="password" class="form-input" id="registerPassword" required placeholder="••••••••">
+          <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">
+            Must be at least 8 characters with numbers and symbols
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Confirm Password</label>
+          <input type="password" class="form-input" id="registerConfirmPassword" required placeholder="••••••••">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Initial Investment Amount</label>
+          <select class="form-select" id="registerInitialInvestment" required>
+            <option value="">Select amount range</option>
+            <option value="1000">$1,000 - $5,000</option>
+            <option value="5000">$5,000 - $25,000</option>
+            <option value="25000">$25,000 - $100,000</option>
+            <option value="100000">$100,000+</option>
+          </select>
+        </div>
+        <div style="margin: 16px 0;">
+          <label style="display: flex; align-items: flex-start; gap: 12px; font-size: 14px; cursor: pointer; line-height: 1.5;">
+            <input type="checkbox" id="agreeTerms" required style="margin-top: 2px;">
+            <span>
+              I agree to the <a href="#" style="color: var(--accent-primary);">Terms of Service</a> and 
+              <a href="#" style="color: var(--accent-primary);">Privacy Policy</a>. I understand that investments 
+              carry risk and past performance doesn't guarantee future results.
+            </span>
+          </label>
+        </div>
+        <div style="margin: 12px 0;">
+          <label style="display: flex; align-items: center; gap: 12px; font-size: 14px; cursor: pointer;">
+            <input type="checkbox" id="marketingConsent">
+            <span>I'd like to receive investment updates and market insights via email</span>
+          </label>
+        </div>
+        <div class="modal-actions" style="flex-direction: column; gap: 12px;">
+          <button type="submit" class="btn btn-primary" style="width: 100%;">Create Account</button>
+          <button type="button" class="btn btn-secondary" id="cancelRegister" style="width: 100%;">Cancel</button>
+        </div>
+        <div style="text-align: center; margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border);">
+          <p style="color: var(--text-secondary); margin: 0; font-size: 14px;">
+            Already have an account? 
+            <a href="#" style="color: var(--accent-primary); text-decoration: none;" id="switchToLogin">Sign in here</a>
+          </p>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <!-- Investment Modal -->
   <div class="modal-overlay" id="investModal">
     <div class="modal">
@@ -878,6 +997,10 @@
   <script>
     // Application State
     const state = {
+      user: {
+        isLoggedIn: false,
+        profile: null
+      },
       portfolio: {
         total: 125420.50,
         available: 5420.50,
@@ -1015,6 +1138,204 @@
             annualReturn: data.rate
           }
         };
+      },
+
+      async login(credentials) {
+        await new Promise(resolve => setTimeout(resolve, 1500));
+        
+        // Simple validation - in production, this would be server-side
+        if (credentials.email === 'demo@investx.com' && credentials.password === 'demo123') {
+          return {
+            success: true,
+            data: {
+              id: 1,
+              email: credentials.email,
+              firstName: 'John',
+              lastName: 'Doe',
+              joinDate: '2023-01-15'
+            }
+          };
+        }
+        
+        return {
+          success: false,
+          message: 'Invalid email or password'
+        };
+      },
+
+      async register(userData) {
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        
+        // Simulate validation
+        if (userData.email.includes('@') && userData.password.length >= 8) {
+          return {
+            success: true,
+            data: {
+              id: Date.now(),
+              email: userData.email,
+              firstName: userData.firstName,
+              lastName: userData.lastName,
+              joinDate: new Date().toISOString().split('T')[0]
+            }
+          };
+        }
+        
+        return {
+          success: false,
+          message: 'Registration failed. Please check your information.'
+        };
+      },
+
+      async logout() {
+        await new Promise(resolve => setTimeout(resolve, 500));
+        return { success: true };
+      }
+    };
+
+    // UI State Management
+    const updateUIForAuthState = () => {
+      const loginBtn = document.getElementById('loginBtn');
+      const registerBtn = document.getElementById('registerBtn');
+      const userActions = document.getElementById('userActions');
+      const brandText = document.querySelector('.brand-text h1');
+
+      if (state.user.isLoggedIn && state.user.profile) {
+        loginBtn.style.display = 'none';
+        registerBtn.style.display = 'none';
+        userActions.style.display = 'flex';
+        userActions.style.gap = '12px';
+        userActions.style.alignItems = 'center';
+        
+        brandText.innerHTML = `Welcome back, ${state.user.profile.firstName}!`;
+        document.querySelector('.brand-text .tagline').textContent = 'Your Investment Portfolio';
+      } else {
+        loginBtn.style.display = 'inline-flex';
+        registerBtn.style.display = 'inline-flex';
+        userActions.style.display = 'none';
+        
+        brandText.textContent = 'InvestX';
+        document.querySelector('.brand-text .tagline').textContent = 'Institutional Investment Platform';
+      }
+    };
+
+    // Authentication Handlers
+    const handleLogin = async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('loginEmail').value;
+      const password = document.getElementById('loginPassword').value;
+
+      if (!email || !password) {
+        showNotification('Please fill in all fields', 'error');
+        return;
+      }
+
+      const submitBtn = e.target.querySelector('button[type="submit"]');
+      setLoading(submitBtn, true);
+      submitBtn.innerHTML = '<div class="spinner"></div> Signing in...';
+
+      try {
+        const response = await api.login({ email, password });
+        
+        if (response.success) {
+          state.user.isLoggedIn = true;
+          state.user.profile = response.data;
+          
+          closeModal('loginModal');
+          updateUIForAuthState();
+          showNotification(`Welcome back, ${response.data.firstName}!`, 'success');
+          
+          // Reset form
+          document.getElementById('loginForm').reset();
+        } else {
+          showNotification(response.message || 'Login failed', 'error');
+        }
+      } catch (error) {
+        showNotification('Login failed. Please try again.', 'error');
+      } finally {
+        submitBtn.innerHTML = 'Sign In';
+        setLoading(submitBtn, false);
+      }
+    };
+
+    const handleRegister = async (e) => {
+      e.preventDefault();
+      const formData = {
+        firstName: document.getElementById('registerFirstName').value,
+        lastName: document.getElementById('registerLastName').value,
+        email: document.getElementById('registerEmail').value,
+        phone: document.getElementById('registerPhone').value,
+        password: document.getElementById('registerPassword').value,
+        confirmPassword: document.getElementById('registerConfirmPassword').value,
+        initialInvestment: document.getElementById('registerInitialInvestment').value
+      };
+
+      // Validation
+      if (!formData.firstName || !formData.lastName || !formData.email || !formData.password) {
+        showNotification('Please fill in all required fields', 'error');
+        return;
+      }
+
+      if (formData.password !== formData.confirmPassword) {
+        showNotification('Passwords do not match', 'error');
+        return;
+      }
+
+      if (formData.password.length < 8) {
+        showNotification('Password must be at least 8 characters', 'error');
+        return;
+      }
+
+      if (!document.getElementById('agreeTerms').checked) {
+        showNotification('Please agree to the Terms of Service', 'error');
+        return;
+      }
+
+      const submitBtn = e.target.querySelector('button[type="submit"]');
+      setLoading(submitBtn, true);
+      submitBtn.innerHTML = '<div class="spinner"></div> Creating account...';
+
+      try {
+        const response = await api.register(formData);
+        
+        if (response.success) {
+          state.user.isLoggedIn = true;
+          state.user.profile = response.data;
+          
+          closeModal('registerModal');
+          updateUIForAuthState();
+          showNotification(`Welcome to InvestX, ${response.data.firstName}!`, 'success');
+          
+          // Reset form
+          document.getElementById('registerForm').reset();
+          
+          // Show welcome message with next steps
+          setTimeout(() => {
+            alert(`Account created successfully!\n\nNext steps:\n1. Verify your email address\n2. Complete KYC verification\n3. Fund your account to start investing\n\nYour account is ready to use with demo data.`);
+          }, 1000);
+        } else {
+          showNotification(response.message || 'Registration failed', 'error');
+        }
+      } catch (error) {
+        showNotification('Registration failed. Please try again.', 'error');
+      } finally {
+        submitBtn.innerHTML = 'Create Account';
+        setLoading(submitBtn, false);
+      }
+    };
+
+    const handleLogout = async () => {
+      try {
+        const response = await api.logout();
+        
+        if (response.success) {
+          state.user.isLoggedIn = false;
+          state.user.profile = null;
+          
+          updateUIForAuthState();
+          showNotification('Successfully logged out', 'success');
+        }
+      } catch (error) {
+        showNotification('Logout failed', 'error');
       }
     };
 
@@ -1310,24 +1631,73 @@ This investment is performing ${investment.performance > investment.rate * 100 ?
 
     // Event Listeners
     const initializeEventListeners = () => {
-      // Header buttons
-      document.getElementById('investBtn').addEventListener('click', () => openModal('investModal'));
-      document.getElementById('withdrawBtn').addEventListener('click', () => openModal('withdrawModal'));
-      document.getElementById('quickInvest').addEventListener('click', () => openModal('investModal'));
+      // Authentication buttons
+      document.getElementById('loginBtn').addEventListener('click', () => openModal('loginModal'));
+      document.getElementById('registerBtn').addEventListener('click', () => openModal('registerModal'));
+      document.getElementById('logoutBtn').addEventListener('click', handleLogout);
 
-      // Modal controls
+      // Header buttons (protected by auth state)
+      document.getElementById('investBtn').addEventListener('click', () => {
+        if (state.user.isLoggedIn) {
+          openModal('investModal');
+        } else {
+          showNotification('Please log in to invest', 'error');
+          openModal('loginModal');
+        }
+      });
+      document.getElementById('withdrawBtn').addEventListener('click', () => {
+        if (state.user.isLoggedIn) {
+          openModal('withdrawModal');
+        } else {
+          showNotification('Please log in to withdraw', 'error');
+          openModal('loginModal');
+        }
+      });
+      document.getElementById('quickInvest').addEventListener('click', () => {
+        if (state.user.isLoggedIn) {
+          openModal('investModal');
+        } else {
+          showNotification('Please log in to invest', 'error');
+          openModal('loginModal');
+        }
+      });
+
+      // Auth modal controls
+      document.getElementById('cancelLogin').addEventListener('click', () => closeModal('loginModal'));
+      document.getElementById('cancelRegister').addEventListener('click', () => closeModal('registerModal'));
+      
+      // Switch between login/register
+      document.getElementById('switchToRegister').addEventListener('click', (e) => {
+        e.preventDefault();
+        closeModal('loginModal');
+        setTimeout(() => openModal('registerModal'), 300);
+      });
+      document.getElementById('switchToLogin').addEventListener('click', (e) => {
+        e.preventDefault();
+        closeModal('registerModal');
+        setTimeout(() => openModal('loginModal'), 300);
+      });
+
+      // Forgot password
+      document.getElementById('forgotPassword').addEventListener('click', (e) => {
+        e.preventDefault();
+        alert('Password reset link would be sent to your email.\n\nFor demo purposes, use:\nEmail: demo@investx.com\nPassword: demo123');
+      });
+
+      // Investment/withdrawal modal controls
       document.getElementById('cancelInvest').addEventListener('click', () => closeModal('investModal'));
       document.getElementById('cancelWithdraw').addEventListener('click', () => closeModal('withdrawModal'));
 
       // Close modals on overlay click
-      document.getElementById('investModal').addEventListener('click', (e) => {
-        if (e.target === e.currentTarget) closeModal('investModal');
-      });
-      document.getElementById('withdrawModal').addEventListener('click', (e) => {
-        if (e.target === e.currentTarget) closeModal('withdrawModal');
+      ['loginModal', 'registerModal', 'investModal', 'withdrawModal'].forEach(modalId => {
+        document.getElementById(modalId).addEventListener('click', (e) => {
+          if (e.target === e.currentTarget) closeModal(modalId);
+        });
       });
 
       // Form submissions
+      document.getElementById('loginForm').addEventListener('submit', handleLogin);
+      document.getElementById('registerForm').addEventListener('submit', handleRegister);
       document.getElementById('investmentForm').addEventListener('submit', handleInvestment);
       document.getElementById('withdrawalForm').addEventListener('submit', handleWithdrawal);
 
@@ -1369,6 +1739,8 @@ Management fee: 1% annually
       // Keyboard shortcuts
       document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') {
+          closeModal('loginModal');
+          closeModal('registerModal');
           closeModal('investModal');
           closeModal('withdrawModal');
         }
@@ -1399,6 +1771,7 @@ Management fee: 1% annually
         document.body.style.opacity = '0.8';
         
         // Initialize components
+        updateUIForAuthState();
         renderPortfolioStats();
         renderInvestmentList();
         initializeChart();
